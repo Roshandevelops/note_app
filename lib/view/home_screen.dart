@@ -14,6 +14,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // bool isLoading = true;
+
   List items = [];
   @override
   void initState() {
@@ -36,40 +38,103 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (ctx, index) {
-            final data = items[index] as Map;
-            // final id = data[] as String;
-            return ListTile(
-              leading: Text('${index + 1}'),
-              title: Text(
-                data["title"],
-              ),
-              subtitle: Text(
-                data["description"],
-              ),
-            );
-          },
+        child: Visibility(
+          visible: items.isNotEmpty,
+          replacement: Center(
+            child: Text("NO TODO ITEM"),
+            // CircularProgressIndicator(),
+          ),
+          child: ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (ctx, index) {
+              final item = items[index] as Map;
+              final id = item["_id"] as String;
+
+              return Card(
+                child: ListTile(
+                  leading: CircleAvatar(
+                    child: Text('${index + 1}'),
+                  ),
+                  title: Text(
+                    item["title"],
+                  ),
+                  subtitle: Text(
+                    item["description"],
+                  ),
+                  trailing: PopupMenuButton(onSelected: (value) {
+                    if (value == "edit") {
+                      editScreen(item);
+                      //edit item
+                    } else if (value == "delete") {
+                      deleteById(id);
+                      //delete item
+                    }
+                  }, itemBuilder: (ctx) {
+                    return [
+                      PopupMenuItem(
+                        child: Text("Edit"),
+                        value: "edit",
+                      ),
+                      PopupMenuItem(
+                        child: Text("Delete"),
+                        value: "delete",
+                      ),
+                    ];
+                  }),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
   }
 
-  void addScreen() {
+  Future<void> addScreen() async {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) {
-          return AddTodo();
+          return AddTodo(
+            onTap: () async {
+              await fetchData();
+            },
+          );
         },
       ),
     );
+    // setState(() {
+    //   isLoading = true;
+    // });
+    await fetchData();
   }
 
-  void fetchData() async {
+  Future<void> editScreen(Map item) async {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) {
+          return AddTodo(
+            todo: item,
+            onTap: () async {
+              await fetchData();
+            },
+            // onTap: () async {
+            //   await fetchData();
+            // },
+          );
+        },
+      ),
+    );
+    // setState(() {
+    //   isLoading = true;
+    // });
+    // await fetchData();
+  }
+
+  Future<void> fetchData() async {
     final response = await http.get(
-        Uri.parse("https://api.nstack.in/v1/todos?page=1&limit=20"),
-        headers: {"accpet": "application/json"});
+      Uri.parse("https://api.nstack.in/v1/todos?page=1&limit=20"),
+      headers: {"accpet": "application/json"},
+    );
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body) as Map;
       final result = json["items"] as List;
@@ -79,8 +144,40 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       );
       log(items.toString());
-    } else {
-      //show error
     }
+  }
+
+  // void refreshData() async {
+  //   await fetchData();
+  // }
+
+  Future<void> deleteById(String id) async {
+    //delete the item
+    //remove item from the list
+
+    final response =
+        await http.delete(Uri.parse("https://api.nstack.in/v1/todos/$id"));
+    final filteredItems = items.where((e) => e["_id"] != id).toList();
+    setState(() {
+      items = filteredItems;
+    });
+    if (response.statusCode == 200) {
+      //success
+    } else {
+      showSnackBarrr("Deletion failed", Colors.red);
+      //failed
+    }
+  }
+
+  void showSnackBarrr(String message, Color backgroundColor) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        showCloseIcon: true,
+        backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
+        padding: EdgeInsets.all(20),
+        content: Text(message),
+      ),
+    );
   }
 }

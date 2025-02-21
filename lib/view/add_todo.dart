@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AddTodo extends StatefulWidget {
-  const AddTodo({super.key});
+  const AddTodo({super.key, this.onTap, this.todo});
+
+  final void Function()? onTap;
+  final Map? todo;
 
   @override
   State<AddTodo> createState() => _AddTodoState();
@@ -13,14 +15,28 @@ class AddTodo extends StatefulWidget {
 
 class _AddTodoState extends State<AddTodo> {
   final TextEditingController titleEditingController = TextEditingController();
-  final TextEditingController contentEditingController =
+  final TextEditingController descriptiontEditingController =
       TextEditingController();
+  bool isEdit = false;
+
+  @override
+  void initState() {
+    final todo = widget.todo;
+    if (todo != null) {
+      isEdit = true;
+      final editTitle = todo["title"];
+      final editDescription = todo["description"];
+      titleEditingController.text = editTitle;
+      descriptiontEditingController.text = editDescription;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Todo"),
+        title: Text(isEdit ? "Edit Todo" : "Add Todo"),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -41,7 +57,7 @@ class _AddTodoState extends State<AddTodo> {
               height: 10,
             ),
             TextFormField(
-              controller: contentEditingController,
+              controller: descriptiontEditingController,
               keyboardType: TextInputType.multiline,
               minLines: 5,
               maxLines: 10,
@@ -55,9 +71,11 @@ class _AddTodoState extends State<AddTodo> {
             ),
             ElevatedButton(
               onPressed: () {
-                submitButtonClicked();
+                isEdit ? updateButtonClicked() : submitButtonClicked();
               },
-              child: Text("Submit"),
+              child: Text(
+                isEdit ? "Update" : "Submit",
+              ),
             ),
           ],
         ),
@@ -65,34 +83,13 @@ class _AddTodoState extends State<AddTodo> {
     );
   }
 
-  // Future<void> subMitButtonClicked() async {
-  //   final title = titleEditingController.text;
-  //   final content = contentEditingController.text;
-  //   final body = {
-  //     "title": title,
-  //     "description": content,
-  //     "is_completed": false
-  //   };
-  //   final response = await http.post(
-  //     Uri.parse("https://api.nstack.in/v1/todos"),
-  //     body: jsonEncode(body),
-  //     headers: {'Content-Typ': 'application/json'},
-  //   );
-
-  //   if (response.statusCode == 201) {
-  //     titleEditingController.text = " ";
-  //     contentEditingController.text = " ";
-  //     print(response.body);
-  //   }
-  // }
-
   void submitButtonClicked() async {
     final titleController = titleEditingController.text;
-    final contentController = contentEditingController.text;
+    final descriptiontController = descriptiontEditingController.text;
 
     final bodyAsJson = {
       "title": titleController,
-      "description": contentController,
+      "description": descriptiontController,
       "is_completed": false
     };
 
@@ -102,18 +99,62 @@ class _AddTodoState extends State<AddTodo> {
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode == 201) {
-      showSnackBarrr("Success");
+      titleEditingController.clear();
+      descriptiontEditingController.clear();
+      widget.onTap!();
+      showSnackBarrr("Success", Colors.green);
+
       Navigator.of(context).pop();
       log(response.body);
     } else {
-      showSnackBarrr("Error");
+      showSnackBarrr("Error", Colors.yellow);
       log(response.body);
     }
   }
 
-  void showSnackBarrr(String message) {
+  Future<void> updateButtonClicked() async {
+    final todo = widget.todo;
+    if (todo == null) {
+      print("you cant update without totdo data");
+      return;
+    }
+    final id = todo["_id"];
+    //  final iscompleted = todo["is_completed"];
+    final titleController = titleEditingController.text;
+    final descriptiontController = descriptiontEditingController.text;
+
+    final bodyAsJson = {
+      "title": titleController,
+      "description": descriptiontController,
+      "is_completed": false
+      //  iscompleted
+    };
+
+    final response = await http.put(
+      Uri.parse("https://api.nstack.in/v1/todos/$id"),
+      body: jsonEncode(bodyAsJson),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      // titleEditingController.clear();
+      // descriptiontEditingController.clear();
+      widget.onTap!();
+      showSnackBarrr("updation success", Colors.green);
+
+      Navigator.of(context).pop();
+      log(response.body);
+    } else {
+      showSnackBarrr(" updation Error", Colors.yellow);
+      log(response.body);
+    }
+  }
+
+  void showSnackBarrr(String message, Color backgroundColor) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        showCloseIcon: true,
+        backgroundColor: backgroundColor,
         behavior: SnackBarBehavior.floating,
         padding: EdgeInsets.all(20),
         content: Text(message),

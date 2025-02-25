@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:to_do_app/controller/todo_provider.dart';
+import 'package:to_do_app/model/todo__model.dart';
 
 class AddTodo extends StatefulWidget {
   const AddTodo({super.key, this.onTap, this.todo});
@@ -71,7 +74,19 @@ class _AddTodoState extends State<AddTodo> {
             ),
             ElevatedButton(
               onPressed: () {
-                isEdit ? updateButtonClicked() : submitButtonClicked();
+                isEdit
+                    ? updateButtonClicked()
+                    : Provider.of<TodoProvider>(context, listen: false)
+                        .addTodoData(
+                            context,
+                            TodoModel(
+                              title: titleEditingController.text,
+                              description: descriptiontEditingController.text,
+                              iscompleted: false,
+                            ),
+                            widget.onTap!);
+
+                // submitButtonClicked();
               },
               child: Text(
                 isEdit ? "Update" : "Submit",
@@ -83,34 +98,34 @@ class _AddTodoState extends State<AddTodo> {
     );
   }
 
-  void submitButtonClicked() async {
-    final titleController = titleEditingController.text;
-    final descriptiontController = descriptiontEditingController.text;
+  // void submitButtonClicked() async {
+  //   final titleController = titleEditingController.text;
+  //   final descriptiontController = descriptiontEditingController.text;
 
-    final bodyAsJson = {
-      "title": titleController,
-      "description": descriptiontController,
-      "is_completed": false
-    };
+  //   final bodyAsJson = {
+  //     "title": titleController,
+  //     "description": descriptiontController,
+  //     "is_completed": false
+  //   };
 
-    final response = await http.post(
-      Uri.parse("https://api.nstack.in/v1/todos"),
-      body: jsonEncode(bodyAsJson),
-      headers: {'Content-Type': 'application/json'},
-    );
-    if (response.statusCode == 201) {
-      titleEditingController.clear();
-      descriptiontEditingController.clear();
-      widget.onTap!();
-      showSnackBarrr("Success", Colors.green);
+  //   final response = await http.post(
+  //     Uri.parse("https://api.nstack.in/v1/todos"),
+  //     body: jsonEncode(bodyAsJson),
+  //     headers: {'Content-Type': 'application/json'},
+  //   );
+  //   if (response.statusCode == 201) {
+  //     titleEditingController.clear();
+  //     descriptiontEditingController.clear();
+  //     widget.onTap!();
+  //     showSnackBarrr("Success", Colors.green);
 
-      Navigator.of(context).pop();
-      log(response.body);
-    } else {
-      showSnackBarrr("Error", Colors.yellow);
-      log(response.body);
-    }
-  }
+  //     Navigator.of(context).pop();
+  //     log(response.body);
+  //   } else {
+  //     showSnackBarrr("Error", Colors.yellow);
+  //     log(response.body);
+  //   }
+  // }
 
   Future<void> updateButtonClicked() async {
     final todo = widget.todo;

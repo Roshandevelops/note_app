@@ -102,10 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
     );
-    // setState(() {
-    //   isLoading = true;
-    // });
-    await fetchData();
   }
 
   Future<void> editScreen(Map item) async {
@@ -117,17 +113,10 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () async {
               await fetchData();
             },
-            // onTap: () async {
-            //   await fetchData();
-            // },
           );
         },
       ),
     );
-    // setState(() {
-    //   isLoading = true;
-    // });
-    // await fetchData();
   }
 
   Future<void> fetchData() async {
@@ -147,14 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // void refreshData() async {
-  //   await fetchData();
-  // }
-
   Future<void> deleteById(String id) async {
-    //delete the item
-    //remove item from the list
-
     final response =
         await http.delete(Uri.parse("https://api.nstack.in/v1/todos/$id"));
     final filteredItems = items.where((e) => e["_id"] != id).toList();
@@ -162,22 +144,6 @@ class _HomeScreenState extends State<HomeScreen> {
       items = filteredItems;
     });
     if (response.statusCode == 200) {
-      //success
-    } else {
-      showSnackBarrr("Deletion failed", Colors.red);
-      //failed
-    }
-  }
-
-  void showSnackBarrr(String message, Color backgroundColor) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        showCloseIcon: true,
-        backgroundColor: backgroundColor,
-        behavior: SnackBarBehavior.floating,
-        padding: EdgeInsets.all(20),
-        content: Text(message),
-      ),
-    );
+    } else {}
   }
 }

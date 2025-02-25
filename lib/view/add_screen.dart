@@ -6,17 +6,17 @@ import 'package:provider/provider.dart';
 import 'package:to_do_app/controller/todo_provider.dart';
 import 'package:to_do_app/model/todo__model.dart';
 
-class AddTodo extends StatefulWidget {
-  const AddTodo({super.key, this.onTap, this.todo});
+class AddScreen extends StatefulWidget {
+  const AddScreen({super.key, this.onTap, this.todo});
 
   final void Function()? onTap;
   final Map? todo;
 
   @override
-  State<AddTodo> createState() => _AddTodoState();
+  State<AddScreen> createState() => _AddScreenState();
 }
 
-class _AddTodoState extends State<AddTodo> {
+class _AddScreenState extends State<AddScreen> {
   final TextEditingController titleEditingController = TextEditingController();
   final TextEditingController descriptiontEditingController =
       TextEditingController();
@@ -97,35 +97,6 @@ class _AddTodoState extends State<AddTodo> {
       )),
     );
   }
-
-  // void submitButtonClicked() async {
-  //   final titleController = titleEditingController.text;
-  //   final descriptiontController = descriptiontEditingController.text;
-
-  //   final bodyAsJson = {
-  //     "title": titleController,
-  //     "description": descriptiontController,
-  //     "is_completed": false
-  //   };
-
-  //   final response = await http.post(
-  //     Uri.parse("https://api.nstack.in/v1/todos"),
-  //     body: jsonEncode(bodyAsJson),
-  //     headers: {'Content-Type': 'application/json'},
-  //   );
-  //   if (response.statusCode == 201) {
-  //     titleEditingController.clear();
-  //     descriptiontEditingController.clear();
-  //     widget.onTap!();
-  //     showSnackBarrr("Success", Colors.green);
-
-  //     Navigator.of(context).pop();
-  //     log(response.body);
-  //   } else {
-  //     showSnackBarrr("Error", Colors.yellow);
-  //     log(response.body);
-  //   }
-  // }
 
   Future<void> updateButtonClicked() async {
     final todo = widget.todo;

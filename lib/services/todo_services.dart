@@ -1,12 +1,14 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:to_do_app/model/todo__model.dart';
 import "package:http/http.dart" as http;
 
 abstract class TodoServices {
-  Future<void> addData(
+  Future<dynamic> addData(
       TodoModel todoModel, BuildContext context, Function onSuccess);
+  Future<void> fetchTodoItems();
 }
 
 class TodoDb extends ChangeNotifier implements TodoServices {
@@ -17,23 +19,36 @@ class TodoDb extends ChangeNotifier implements TodoServices {
   }
 
   @override
-  Future<void> addData(
+  Future<dynamic> addData(
       TodoModel todoModel, BuildContext context, Function onSuccess) async {
-    try {
-      final response = await http.post(
-        Uri.parse("https://api.nstack.in/v1/todos"),
-        body: jsonEncode(todoModel.toJson()),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode == 201) {
-        onSuccess();
-        //  widget.onTap!;
+    final response = await http.post(
+      Uri.parse("https://api.nstack.in/v1/todos"),
+      body: jsonEncode(todoModel.toJson()),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if (response.statusCode == 201) {
+      onSuccess();
 
-        Navigator.of(context).pop();
-        notifyListeners();
-      }
-    } catch (e) {
-      print("Error");
+      Navigator.of(context).pop();
+      notifyListeners();
+    }
+    return response;
+  }
+
+  @override
+  Future<void> fetchTodoItems() async {
+    final response = await http.get(
+      Uri.parse("https://api.nstack.in/v1/todos?page=1&limit=20"),
+      headers: {"accpet": "application/json"},
+    );
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map;
+      final result = json["items"] as List;
+      // setState(
+      //   () {
+      //     items = result;
+      //   },
+      // );
     }
   }
 }

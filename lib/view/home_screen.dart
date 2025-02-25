@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:to_do_app/view/add_todo.dart';
+import 'package:to_do_app/view/add_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) {
-          return AddTodo(
+          return AddScreen(
             onTap: () async {
               await fetchData();
             },
@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) {
-          return AddTodo(
+          return AddScreen(
             todo: item,
             onTap: () async {
               await fetchData();

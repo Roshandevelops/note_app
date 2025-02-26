@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:to_do_app/controller/todo_provider.dart';
 
@@ -41,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Consumer<TodoProvider>(builder: (context, todoprovider, child) {
         items = todoprovider.newFetchedItems;
-
         return Padding(
           padding: const EdgeInsets.all(8.0),
           child: Visibility(
@@ -70,12 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     trailing: PopupMenuButton(onSelected: (value) {
                       if (value == "edit") {
                         editScreen(item);
-                        //edit item
                       } else if (value == "delete") {
                         Provider.of<TodoProvider>(context, listen: false)
                             .deleteItemFromServer(id, items);
-                        // deleteById(id);
-                        //delete item
                       }
                     }, itemBuilder: (ctx) {
                       return [
@@ -106,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
           return AddScreen(
             onTap: () async {
               await Provider.of<TodoProvider>(context, listen: false).getData();
-              // fetchData();
             },
           );
         },
@@ -123,42 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () async {
               await Provider.of<TodoProvider>(context, listen: false).getData();
               log("edited".toString());
-              // await fetchData();
             },
           );
         },
       ),
     );
   }
-
-  // Future<void> fetchData() async {
-  //   final response = await http.get(
-  //     Uri.parse("https://api.nstack.in/v1/todos?page=1&limit=20"),
-  //     headers: {"accpet": "application/json"},
-  //   );
-  //   if (response.statusCode == 200) {
-  //     final json = jsonDecode(response.body) as Map;
-  //     final result = json["items"] as List;
-  //     setState(
-  //       () {
-  //         items = result;
-  //       },
-  //     );
-  //     log(items.toString());
-  //   }
-  // }
-
-  // Future<void> deleteById(String id) async {
-  //   final response =
-  //       await http.delete(Uri.parse("https://api.nstack.in/v1/todos/$id"));
-  //   final filteredItems = items.where((e) => e["_id"] != id).toList();
-  //   setState(() {
-  //     items = filteredItems;
-  //   });
-  //   if (response.statusCode == 200) {
-  //     print("hey vasu");
-  //   } else {
-  //     print("cant delete");
-  //   }
-  // }
 }

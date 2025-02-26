@@ -12,7 +12,7 @@ class TodoProvider with ChangeNotifier {
     await TodoDb.instance.addData(todoModel, context, onSuccess);
   }
 
-  Future<dynamic> getData() async {
+  Future<void> getData() async {
     final fetchedItems = await TodoDb.instance.fetchTodoItems();
     newFetchedItems = fetchedItems;
     log(newFetchedItems.toString());
@@ -25,5 +25,15 @@ class TodoProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> editData() async {}
+  Future<void> editTodoData(
+    Map? todo,
+    TextEditingController titleEdit,
+    TextEditingController descriptionEdit,
+    BuildContext context,
+    Function()? onTap,
+  ) async {
+    await TodoDb.instance
+        .editData(todo, titleEdit, descriptionEdit, context, onTap);
+    notifyListeners();
+  }
 }

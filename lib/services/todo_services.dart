@@ -8,7 +8,14 @@ import "package:http/http.dart" as http;
 abstract class TodoServices {
   Future<dynamic> addData(
       TodoModel todoModel, BuildContext context, Function onSuccess);
-  Future<void> fetchTodoItems();
+  Future<dynamic> fetchTodoItems();
+  Future<List> deleteById(String id, dynamic items);
+  Future<dynamic> editData(
+      Map? todo,
+      TextEditingController titleEdit,
+      TextEditingController descriptionEdit,
+      BuildContext context,
+      Function()? onTap);
 }
 
 class TodoDb extends ChangeNotifier implements TodoServices {
@@ -34,9 +41,6 @@ class TodoDb extends ChangeNotifier implements TodoServices {
     }
     return response;
   }
-
-  Future<dynamic> editTodo(
-      TodoModel todoModel, BuildContext context, Function onSuccess) async {}
 
   @override
   Future<dynamic> fetchTodoItems() async {
@@ -65,5 +69,40 @@ class TodoDb extends ChangeNotifier implements TodoServices {
       print("cant delete");
     }
     return filteredItems;
+  }
+
+  Future<dynamic> editData(
+      Map? todo,
+      TextEditingController titleEdit,
+      TextEditingController descriptionEdit,
+      BuildContext context,
+      Function()? onTap) async {
+    final todoSample = todo;
+    if (todoSample == null) {
+      print("you cant update without totdo data");
+      return;
+    }
+    final id = todoSample["_id"];
+    final titleController = titleEdit.text;
+    final descriptiontController = descriptionEdit.text;
+    final bodyAsJson = {
+      "title": titleController,
+      "description": descriptiontController,
+      "is_completed": false
+    };
+    final response = await http.put(
+      Uri.parse("https://api.nstack.in/v1/todos/$id"),
+      body: jsonEncode(bodyAsJson),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if (response.statusCode == 200) {
+      onTap!();
+      Navigator.of(context).pop();
+      log(response.body);
+    } else {
+      log(response.body);
+    }
+    notifyListeners();
+    return response;
   }
 }

@@ -75,7 +75,14 @@ class _AddScreenState extends State<AddScreen> {
             ElevatedButton(
               onPressed: () {
                 isEdit
-                    ? updateButtonClicked()
+                    ? Provider.of<TodoProvider>(context, listen: false)
+                        .editTodoData(
+                        widget.todo,
+                        titleEditingController,
+                        descriptiontEditingController,
+                        context,
+                        widget.onTap,
+                      )
                     : Provider.of<TodoProvider>(context, listen: false)
                         .addTodoData(
                             context,
@@ -96,31 +103,31 @@ class _AddScreenState extends State<AddScreen> {
     );
   }
 
-  Future<void> updateButtonClicked() async {
-    final todo = widget.todo;
-    if (todo == null) {
-      print("you cant update without totdo data");
-      return;
-    }
-    final id = todo["_id"];
-    final titleController = titleEditingController.text;
-    final descriptiontController = descriptiontEditingController.text;
-    final bodyAsJson = {
-      "title": titleController,
-      "description": descriptiontController,
-      "is_completed": false
-    };
-    final response = await http.put(
-      Uri.parse("https://api.nstack.in/v1/todos/$id"),
-      body: jsonEncode(bodyAsJson),
-      headers: {'Content-Type': 'application/json'},
-    );
-    if (response.statusCode == 200) {
-      widget.onTap!();
-      Navigator.of(context).pop();
-      log(response.body);
-    } else {
-      log(response.body);
-    }
-  }
+  // Future<void> updateButtonClicked() async {
+  //   final todoSample = widget.todo;
+  //   if (todoSample == null) {
+  //     print("you cant update without totdo data");
+  //     return;
+  //   }
+  //   final id = todoSample["_id"];
+  //   final titleController = titleEditingController.text;
+  //   final descriptiontController = descriptiontEditingController.text;
+  //   final bodyAsJson = {
+  //     "title": titleController,
+  //     "description": descriptiontController,
+  //     "is_completed": false
+  //   };
+  //   final response = await http.put(
+  //     Uri.parse("https://api.nstack.in/v1/todos/$id"),
+  //     body: jsonEncode(bodyAsJson),
+  //     headers: {'Content-Type': 'application/json'},
+  //   );
+  //   if (response.statusCode == 200) {
+  //     widget.onTap!();
+  //     Navigator.of(context).pop();
+  //     log(response.body);
+  //   } else {
+  //     log(response.body);
+  //   }
+  // }
 }

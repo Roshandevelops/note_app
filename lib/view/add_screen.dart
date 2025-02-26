@@ -85,8 +85,6 @@ class _AddScreenState extends State<AddScreen> {
                               iscompleted: false,
                             ),
                             widget.onTap!);
-
-                // submitButtonClicked();
               },
               child: Text(
                 isEdit ? "Update" : "Submit",
@@ -105,46 +103,24 @@ class _AddScreenState extends State<AddScreen> {
       return;
     }
     final id = todo["_id"];
-    //  final iscompleted = todo["is_completed"];
     final titleController = titleEditingController.text;
     final descriptiontController = descriptiontEditingController.text;
-
     final bodyAsJson = {
       "title": titleController,
       "description": descriptiontController,
       "is_completed": false
-      //  iscompleted
     };
-
     final response = await http.put(
       Uri.parse("https://api.nstack.in/v1/todos/$id"),
       body: jsonEncode(bodyAsJson),
       headers: {'Content-Type': 'application/json'},
     );
-
     if (response.statusCode == 200) {
-      // titleEditingController.clear();
-      // descriptiontEditingController.clear();
       widget.onTap!();
-      showSnackBarrr("updation success", Colors.green);
-
       Navigator.of(context).pop();
       log(response.body);
     } else {
-      showSnackBarrr(" updation Error", Colors.yellow);
       log(response.body);
     }
-  }
-
-  void showSnackBarrr(String message, Color backgroundColor) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        showCloseIcon: true,
-        backgroundColor: backgroundColor,
-        behavior: SnackBarBehavior.floating,
-        padding: EdgeInsets.all(20),
-        content: Text(message),
-      ),
-    );
   }
 }

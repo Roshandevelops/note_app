@@ -35,8 +35,11 @@ class TodoDb extends ChangeNotifier implements TodoServices {
     return response;
   }
 
+  Future<dynamic> editTodo(
+      TodoModel todoModel, BuildContext context, Function onSuccess) async {}
+
   @override
-  Future<void> fetchTodoItems() async {
+  Future<dynamic> fetchTodoItems() async {
     final response = await http.get(
       Uri.parse("https://api.nstack.in/v1/todos?page=1&limit=20"),
       headers: {"accpet": "application/json"},
@@ -44,11 +47,23 @@ class TodoDb extends ChangeNotifier implements TodoServices {
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body) as Map;
       final result = json["items"] as List;
-      // setState(
-      //   () {
-      //     items = result;
-      //   },
-      // );
+
+      return result;
     }
+    notifyListeners();
+  }
+
+  Future<List> deleteById(String id, dynamic items) async {
+    final response =
+        await http.delete(Uri.parse("https://api.nstack.in/v1/todos/$id"));
+    final filteredItems = items.where((e) => e["_id"] != id).toList();
+
+    if (response.statusCode == 200) {
+      log(response.body);
+      log("working");
+    } else {
+      print("cant delete");
+    }
+    return filteredItems;
   }
 }

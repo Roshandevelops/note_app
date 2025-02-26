@@ -1,7 +1,5 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:provider/provider.dart';
 import 'package:to_do_app/controller/todo_provider.dart';
 import 'package:to_do_app/model/todo__model.dart';
@@ -51,12 +49,12 @@ class _AddScreenState extends State<AddScreen> {
               controller: titleEditingController,
               minLines: 1,
               maxLines: 2,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Title",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             TextFormField(
@@ -64,12 +62,12 @@ class _AddScreenState extends State<AddScreen> {
               keyboardType: TextInputType.multiline,
               minLines: 5,
               maxLines: 10,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Content",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             ElevatedButton(

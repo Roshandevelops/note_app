@@ -36,7 +36,10 @@ class TodoDb extends ChangeNotifier implements TodoServices {
     if (response.statusCode == 201) {
       onSuccess();
 
-      Navigator.of(context).pop();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+
       notifyListeners();
     }
     return response;
@@ -57,6 +60,7 @@ class TodoDb extends ChangeNotifier implements TodoServices {
     notifyListeners();
   }
 
+  @override
   Future<List> deleteById(String id, dynamic items) async {
     final response =
         await http.delete(Uri.parse("https://api.nstack.in/v1/todos/$id"));
@@ -66,11 +70,12 @@ class TodoDb extends ChangeNotifier implements TodoServices {
       log(response.body);
       log("working");
     } else {
-      print("cant delete");
+      log("cant delete");
     }
     return filteredItems;
   }
 
+  @override
   Future<dynamic> editData(
       Map? todo,
       TextEditingController titleEdit,
@@ -79,7 +84,7 @@ class TodoDb extends ChangeNotifier implements TodoServices {
       Function()? onTap) async {
     final todoSample = todo;
     if (todoSample == null) {
-      print("you cant update without totdo data");
+      log("you cant update without totdo data");
       return;
     }
     final id = todoSample["_id"];
@@ -97,7 +102,10 @@ class TodoDb extends ChangeNotifier implements TodoServices {
     );
     if (response.statusCode == 200) {
       onTap!();
-      Navigator.of(context).pop();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+
       log(response.body);
     } else {
       log(response.body);

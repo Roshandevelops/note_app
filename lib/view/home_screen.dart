@@ -28,13 +28,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("TODO"),
+        title: const Text("TODO"),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           addScreen();
         },
-        child: Text("Add"),
+        child: const Text("Add"),
       ),
       body: Consumer<TodoProvider>(builder: (context, todoprovider, child) {
         items = todoprovider.newFetchedItems;
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(8.0),
           child: Visibility(
             visible: items.isNotEmpty,
-            replacement: Center(
+            replacement: const Center(
               child: Text("NO TODO ITEM"),
               // CircularProgressIndicator(),
             ),
@@ -72,13 +72,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     }, itemBuilder: (ctx) {
                       return [
-                        PopupMenuItem(
-                          child: Text("Edit"),
+                        const PopupMenuItem(
                           value: "edit",
+                          child: Text("Edit"),
                         ),
-                        PopupMenuItem(
-                          child: Text("Delete"),
+                        const PopupMenuItem(
                           value: "delete",
+                          child: Text("Delete"),
                         ),
                       ];
                     }),

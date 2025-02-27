@@ -7,7 +7,7 @@ import "package:http/http.dart" as http;
 
 abstract class TodoServices {
   Future<dynamic> addData(
-      TodoModel todoModel, BuildContext context, Function onSuccess);
+      TodoModel todoModel, BuildContext context, void Function() onSuccess);
   Future<dynamic> fetchTodoItems();
   Future<List> deleteById(String id, dynamic items);
   Future<dynamic> editData(
@@ -18,7 +18,7 @@ abstract class TodoServices {
       Function()? onTap);
 }
 
-class TodoDb extends ChangeNotifier implements TodoServices {
+class TodoDb extends TodoServices {
   TodoDb.internal();
   static TodoDb instance = TodoDb.internal();
   factory TodoDb() {
@@ -27,7 +27,10 @@ class TodoDb extends ChangeNotifier implements TodoServices {
 
   @override
   Future<dynamic> addData(
-      TodoModel todoModel, BuildContext context, Function onSuccess) async {
+    TodoModel todoModel,
+    BuildContext context,
+    void Function() onSuccess,
+  ) async {
     final response = await http.post(
       Uri.parse("https://api.nstack.in/v1/todos"),
       body: jsonEncode(todoModel.toJson()),
@@ -39,12 +42,11 @@ class TodoDb extends ChangeNotifier implements TodoServices {
       if (context.mounted) {
         Navigator.of(context).pop();
       }
-
-      notifyListeners();
     }
     return response;
   }
 
+  ///////////////////////////////////////////////////
   @override
   Future<dynamic> fetchTodoItems() async {
     final response = await http.get(
@@ -57,8 +59,9 @@ class TodoDb extends ChangeNotifier implements TodoServices {
 
       return result;
     }
-    notifyListeners();
   }
+
+  ////////////////////////////////
 
   @override
   Future<List> deleteById(String id, dynamic items) async {
@@ -110,7 +113,6 @@ class TodoDb extends ChangeNotifier implements TodoServices {
     } else {
       log(response.body);
     }
-    notifyListeners();
     return response;
   }
 }

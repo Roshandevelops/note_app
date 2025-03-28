@@ -9,13 +9,14 @@ abstract class TodoServices {
   Future<dynamic> addData(
       TodoModel todoModel, BuildContext context, void Function() onSuccess);
   Future<dynamic> fetchTodoItems();
-  Future<List> deleteById(String id, dynamic items);
   Future<dynamic> editData(
-      Map? todo,
-      TextEditingController titleEdit,
-      TextEditingController descriptionEdit,
-      BuildContext context,
-      Function()? onTap);
+    Map? todo,
+    TextEditingController titleEdit,
+    TextEditingController descriptionEdit,
+    BuildContext context,
+    Function()? onTap,
+  );
+  Future<List> deleteById(String id, dynamic items);
 }
 
 class TodoDb extends TodoServices {
@@ -46,36 +47,21 @@ class TodoDb extends TodoServices {
     return response;
   }
 
-  ///////////////////////////////////////////////////
   @override
   Future<dynamic> fetchTodoItems() async {
     final response = await http.get(
-      Uri.parse("https://api.nstack.in/v1/todos?page=1&limit=20"),
+      Uri.parse(
+        "https://api.nstack.in/v1/todos?page=1&limit=20",
+      ),
       headers: {"accpet": "application/json"},
     );
     if (response.statusCode == 200) {
+      log("${response.request} kunjaaappuuukka");
       final json = jsonDecode(response.body) as Map;
       final result = json["items"] as List;
 
       return result;
     }
-  }
-
-  ////////////////////////////////
-
-  @override
-  Future<List> deleteById(String id, dynamic items) async {
-    final response =
-        await http.delete(Uri.parse("https://api.nstack.in/v1/todos/$id"));
-    final filteredItems = items.where((e) => e["_id"] != id).toList();
-
-    if (response.statusCode == 200) {
-      log(response.body);
-      log("working");
-    } else {
-      log("cant delete");
-    }
-    return filteredItems;
   }
 
   @override
@@ -114,5 +100,20 @@ class TodoDb extends TodoServices {
       log(response.body);
     }
     return response;
+  }
+
+  @override
+  Future<List> deleteById(String id, dynamic items) async {
+    final response =
+        await http.delete(Uri.parse("https://api.nstack.in/v1/todos/$id"));
+    final filteredItems = items.where((e) => e["_id"] != id).toList();
+
+    if (response.statusCode == 200) {
+      log(response.body);
+      log("working");
+    } else {
+      log("cant delete");
+    }
+    return filteredItems;
   }
 }
